@@ -1,0 +1,6 @@
+Ciao! Questa è la mia prima mail mandata con Python.
+
+
+Cordiali saluti,
+
+Lomazzi Riccardo
