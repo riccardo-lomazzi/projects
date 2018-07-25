@@ -35,7 +35,7 @@ def polimi_parser_request(classroom):
 #activate cmdprompt logging
 logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 #add token to Telegram Updater
-updater = Updater(token='370975733:AAGOHpsm5DvVSZX_TPRVlvt_nZ4AYYUb4mc') 
+updater = Updater(token='#myapikey#') 
 dispatcher = updater.dispatcher #activated dispatcher
 start_handler = CommandHandler('start', start)
 dispatcher.add_handler(start_handler)
