@@ -1,0 +1,49 @@
+{
+	"paths": [
+
+		{
+			"extension": "wav",
+			"path": "Music"
+		},
+		{
+			"extension": "pdf",
+			"path": "Documents"
+		},
+		{
+			"extension": "doc",
+			"path": "Documents"
+		},
+		{
+			"extension": "mp3",
+			"path": "Music"
+		},
+		{
+			"extension": "mp4",
+			"path": "Videos"
+		},
+		{
+			"extension": "mkv",
+			"path": "Videos"
+		},
+		{
+			"extension": "srt",
+			"path": "Subtitles"
+		},
+		{
+			"extension": "py",
+			"path": "Python"
+		},
+		{
+			"extension": "json",
+			"path": "Json"
+		},
+		{
+			"extension": "png",
+			"path": "Images"
+		},
+		{
+			"extension": "txt",
+			"path": "Documents"
+		}
+	]
+}
