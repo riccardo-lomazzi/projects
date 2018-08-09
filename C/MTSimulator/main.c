@@ -54,8 +54,8 @@ typedef struct node
 typedef struct
 {
     Cell * head; //not to be confused with the pointer to first element - this is the pinhead of the MT tape
-    Cell * first;
-    Cell * last;
+    //Cell * first;
+    //Cell * last;
 } Tape;
 
 typedef struct StackElement
@@ -93,7 +93,6 @@ void freeTrArray(TransitionArray *);
 //ACCEPT STATES ARRAY FUNCTIONS
 int * readASArray(FILE *, int *);
 void printASArray(IntArray);
-//void freeASArray(int *, int); //unnecessary -> we just need to free the pointer
 //MAX MOVES FUNCTION
 int readMaxMoves(FILE *);
 //INPUT MANIPULATION
@@ -136,7 +135,7 @@ int main()
     StringArray * readStringsArray = NULL;
     printf("Welcome to Machine Turing Simulator\n");
     //file opening
-    char inputFileName[30] = "ww.txt";
+    char inputFileName[30] = "ww.txt"; //<--- *your file path*
     fpIN = fopen(inputFileName, "r");
     if(fpIN == 0)
     {
@@ -148,12 +147,12 @@ int main()
         readFile(fpIN, &mt, &readStringsArray);
         fclose(fpIN);
         //printMT(mt);
-        //printStrArray(readStringsArray);
-        //fpOUT = fopen("output.txt", "w");
+        //printStrArray(readStringsArray); //uncomment these lines if you'd like to see the parsed file
+        fpOUT = fopen("output.txt", "w");
 
         startMT(mt, readStringsArray, fpOUT);
 
-        //fclose(fpOUT);
+        fclose(fpOUT);
         freeMT(&mt);
         freeStrArray(&readStringsArray);
     }
@@ -406,14 +405,14 @@ char * truncate(char * str)
 
 void startMT(TuringMachine * mt, StringArray * strArray, FILE * fpout)
 {
-    int level, i, pushed, stacktopLevel, pushhistory, pophistory;
+    int level, i, pushed, stacktopLevel;
     char esito;
     Stack * stack;
     StackElement * lastExecuted;
-    for(i=0;strArray->strings[i]!='\0';i++)
+    for(i=0;strcmp(strArray->strings[i],"END")!=0;i++)
     {
         //initial declarations
-        esito = '0'; pushhistory = 0; pophistory = 0;
+        esito = '0';
         mt->current_state = 0;
         lastExecuted = NULL;
         stack = NULL;
@@ -425,7 +424,6 @@ void startMT(TuringMachine * mt, StringArray * strArray, FILE * fpout)
         {
             //search for all the possible transitions saved in the array, from the current state with the currently pointed char on the tape head
             pushed = searchAndPushStackConfigs(&stack, (mt->trArray.trArray), mt->current_state, mt->tape->head->value, level);
-            pushhistory+=pushed;
 
             if(isStackEmpty(stack)==true && pushed==0){ //if the stack is already empty, and the search failed, than it means that no transition was found
                 break;
@@ -447,9 +445,6 @@ void startMT(TuringMachine * mt, StringArray * strArray, FILE * fpout)
             }
             else
             {
-                if(lastExecuted == stack->topElement){
-                    //printf("\nStallo\n");
-                }
                 //POP
                 //last possible computation because max_moves has been reached OR we're just executing the same last transition
                 if(esito != 'U' && level>=mt->max_moves){ //if we're here because the number of max moves has been reached, flag it with esito="U"
@@ -492,8 +487,7 @@ void startMT(TuringMachine * mt, StringArray * strArray, FILE * fpout)
                     reverseTransition(mt,&reversed);
                     level--;
                     popFromStack(&stack);
-                    pophistory++;
-                    lastExecuted = stack->topElement;
+                    lastExecuted = stack->topElement; //update last executed index
                 }
                 //after all these pops, level will be set one further than the topElement one
                 if(isStackEmpty(stack)==true)
@@ -504,7 +498,8 @@ void startMT(TuringMachine * mt, StringArray * strArray, FILE * fpout)
             level = stack->topElement->level + 1;
         }
         //write on file
-        printf(" Esito: %c\n", esito);
+        printf("Esito: %c\n", esito);
+        fprintf(fpout, "%c\n", esito);
         freeStack(&stack);
         freeTape(&(mt->tape->head));
     }
@@ -652,7 +647,6 @@ void printStack(Stack * stack){
     }
     StackElement * temp = stack->topElement;
     while(temp!=NULL){
-        printf("\nStackHeight: %d Element Tree Level %d Transition: ", stack->topLevel, temp->level);
         printTransition(temp->stackTransition);
         temp = temp->next;
     }
@@ -682,7 +676,7 @@ void copyOnTape(Tape ** tape, char * str)
         appendInTape(&((*tape)->head), str[i]);
         i++;
     }
-    (*tape)->first = (*tape)->head;
+    //(*tape)->first = (*tape)->head;
 }
 
 void appendInTape(Cell ** head, char element)
@@ -776,7 +770,7 @@ void readStrArray(FILE * inputFile, StringArray ** stringArray)
     if(*stringArray == NULL)
     {
         *stringArray = malloc(sizeof(StringArray));
-        (*stringArray)->size = 20; //let's load 20 strings at the moment
+        (*stringArray)->size = 10; //let's load 10 strings first
         (*stringArray)->strings = malloc(sizeof(char*)*((*stringArray)->size)); //and allocate an array of 20 strings
     }
     char * row = (char *)malloc(STRINPUTLEN * sizeof(char)); //this is the test test string that it's going to be read
@@ -791,14 +785,18 @@ void readStrArray(FILE * inputFile, StringArray ** stringArray)
         strcpy((*stringArray)->strings[i], row); //copy the string in the array
         i++;
     }
-    (*stringArray)->strings[i] = '\0';
+    if(i<(*stringArray)->size)
+    {
+        (*stringArray)->strings[i] = malloc(sizeof(char *) * 4);
+        strcpy((*stringArray)->strings[i], "END");
+    }
     free(row);
 }
 
 void freeStrArray(StringArray ** stringArray)
 {
     int i=0;
-    while((*stringArray)->strings[i]!='\0'){
+    while(strcmp((*stringArray)->strings[i],"END")!=0){
         free((*stringArray)->strings[i]);
         i++;
     }
@@ -809,7 +807,7 @@ void freeStrArray(StringArray ** stringArray)
 
 void printStrArray(StringArray * stringArray){
     int i=0;
-    while(stringArray->strings[i]!=NULL){
+    while(strcmp((stringArray->strings[i]),"END")!=0){
         puts(stringArray->strings[i]);
         i++;
     }
