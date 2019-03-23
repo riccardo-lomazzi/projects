@@ -1,0 +1,3 @@
+[submodule "C#/CSVColumnAligner"]
+	path = "C#/CSVColumnAligner"
+	url = https://github.com/riccardo-lomazzi/projects.git
